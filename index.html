@@ -1,0 +1,2215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEDIVIA - Patient Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-blue: #3a7bd5;
+            --primary-gradient: linear-gradient(to right, #3a7bd5, #00d2ff);
+            --light-blue: #e3f2fd;
+            --soft-blue: #f0f8ff;
+            --text-primary: #2c3e50;
+            --text-secondary: #7f8c8d;
+            --success-green: #2ecc71;
+            --warning-orange: #f39c12;
+            --danger-red: #e74c3c;
+            --purple-accent: #9b59b6;
+            --border-color: #dfe6e9;
+            --background: #f5f7fa;
+            --white: #ffffff;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --font-size-base: 16px;
+        }
+
+        .dark-mode {
+            --primary-blue: #3498db;
+            --primary-gradient: linear-gradient(to right, #3498db, #2c3e50);
+            --light-blue: #2c3e50;
+            --soft-blue: #34495e;
+            --text-primary: #ecf0f1;
+            --text-secondary: #bdc3c7;
+            --success-green: #27ae60;
+            --warning-orange: #f39c12;
+            --danger-red: #e74c3c;
+            --border-color: #34495e;
+            --background: #2c3e50;
+            --white: #34495e;
+            --card-bg: #34495e;
+        }
+
+        .large-font {
+            font-size: calc(var(--font-size-base) * 1.2);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: var(--font-size-base);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 20px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 0 0 20px 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-placeholder {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 24px;
+            overflow: hidden;
+        }
+
+        .logo-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .app-title {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(to right, #fff, #e0f7fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-success {
+            background: var(--success-green);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger-red);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning-orange);
+            color: white;
+        }
+
+        .btn-purple {
+            background: var(--purple-accent);
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 24px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-blue);
+        }
+
+        .card-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .grid {
+            display: grid;
+            gap: 25px;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+
+        .patient-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .info-value {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .status-verified {
+            color: var(--success-green);
+            font-weight: 600;
+        }
+
+        .medical-section {
+            margin-bottom: 20px;
+        }
+
+        .medical-title {
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+            font-size: 17px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .medical-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .medical-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .medical-list li:last-child {
+            border-bottom: none;
+        }
+
+        .prescription-item, .report-item, .insurance-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            background: var(--soft-blue);
+            transition: all 0.3s;
+        }
+
+        .prescription-item:hover, .report-item:hover, .insurance-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .prescription-info, .report-info, .insurance-info {
+            flex-grow: 1;
+        }
+
+        .prescription-title, .report-title, .insurance-title {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .prescription-date, .report-date, .insurance-date {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .prescription-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-top: 15px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .prescription-actions, .report-actions, .insurance-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 320px;
+            margin: 20px 0;
+            background: var(--white);
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        .emergency-contact {
+            background: var(--soft-blue);
+            padding: 18px;
+            border-radius: 12px;
+            border-left: 5px solid var(--danger-red);
+            margin-bottom: 18px;
+            transition: all 0.3s;
+        }
+
+        .emergency-contact:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .emergency-contact h4 {
+            color: var(--danger-red);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .call-btn {
+            background: var(--success-green);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+
+        .call-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .chatbot-container {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 380px;
+            max-height: 550px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .chatbot-container.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .chatbot-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 18px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-messages {
+            height: 350px;
+            overflow-y: auto;
+            padding: 18px;
+            background: var(--soft-blue);
+            flex-grow: 1;
+        }
+
+        .chat-message {
+            margin-bottom: 15px;
+            padding: 12px 15px;
+            border-radius: 15px;
+            max-width: 85%;
+            line-height: 1.5;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chat-message.ai {
+            background: var(--white);
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+            color: var(--text-primary);
+        }
+
+        .chat-message.user {
+            background: var(--primary-blue);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+
+        .chatbot-input {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid var(--border-color);
+            background: var(--card-bg);
+        }
+
+        .chatbot-input input {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px 0 0 10px;
+            outline: none;
+            background: var(--white);
+            color: var(--text-primary);
+        }
+
+        .chatbot-input button {
+            padding: 12px 18px;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 0 10px 10px 0;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .chatbot-input button:hover {
+            background: var(--primary-gradient);
+        }
+
+        .chat-toggle {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 70px;
+            height: 70px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 28px;
+            box-shadow: 0 8px 25px rgba(58, 123, 213, 0.4);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .chat-toggle:hover {
+            transform: scale(1.1) rotate(10deg);
+            box-shadow: 0 10px 30px rgba(58, 123, 213, 0.6);
+        }
+
+        .privacy-note {
+            background: var(--light-blue);
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 25px;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .location-share-btn {
+            background: linear-gradient(135deg, var(--danger-red), #c0392b);
+            color: white;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 600;
+            width: 100%;
+            margin: 12px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .location-share-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.3);
+        }
+
+        .hospital-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 18px;
+            background: var(--card-bg);
+            transition: all 0.3s;
+        }
+
+        .hospital-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .hospital-name {
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hospital-distance {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .appointment-form {
+            display: none;
+            margin-top: 18px;
+            padding: 18px;
+            background: var(--soft-blue);
+            border-radius: 12px;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .appointment-form input, .appointment-form select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--white);
+            color: var(--text-primary);
+        }
+
+        .appointment-form input:focus, .appointment-form select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 2px rgba(58, 123, 213, 0.2);
+        }
+
+        .reminder-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 12px;
+            background: var(--card-bg);
+            transition: all 0.3s;
+        }
+
+        .reminder-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .diet-plan {
+            background: linear-gradient(135deg, var(--success-green), #27ae60);
+            color: white;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 18px;
+            transition: all 0.3s;
+        }
+
+        .diet-plan:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.3);
+        }
+
+        .wallet-balance {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--success-green);
+            margin: 15px 0;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .wallet-balance:hover {
+            transform: scale(1.05);
+        }
+
+        .payment-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 18px;
+            justify-content: center;
+        }
+
+        .payment-option {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .payment-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .payment-option img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+
+        .prescription-image-container {
+            margin-top: 18px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .share-buttons {
+            display: none;
+            gap: 12px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .share-btn {
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .share-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+        }
+
+        .sms-btn {
+            background: #34B7F1;
+            color: white;
+        }
+
+        .email-btn {
+            background: #EA4335;
+            color: white;
+        }
+
+        .login-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-box {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .login-box h2 {
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--white);
+            color: var(--text-primary);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(58, 123, 213, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header {
+                margin: -15px -15px 15px -15px;
+                padding: 15px;
+            }
+
+            .app-title {
+                font-size: 22px;
+            }
+
+            .patient-info {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .chatbot-container {
+                width: calc(100% - 30px);
+                bottom: 15px;
+                right: 15px;
+                left: 15px;
+                max-height: 70vh;
+            }
+
+            .chart-container {
+                height: 280px;
+            }
+
+            .prescription-actions, .report-actions, .insurance-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .payment-options {
+                flex-direction: column;
+            }
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(26px);
+        }
+
+        .notification {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            background: linear-gradient(135deg, var(--primary-blue), #2980b9);
+            color: white;
+            padding: 18px 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            animation: slideInRight 0.5s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 400px;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            margin-left: 15px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* New color accents */
+        .accent-purple {
+            color: var(--purple-accent);
+        }
+
+        .bg-gradient {
+            background: var(--primary-gradient);
+        }
+
+        .text-gradient {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Payment modal styles */
+        .payment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .payment-modal-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .payment-option-btn {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--white);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .payment-option-btn:hover {
+            background: var(--light-blue);
+        }
+
+        .payment-option-btn.selected {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Container (Hidden by default) -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-box">
+            <h2>MEDIVIA Login</h2>
+            <input type="text" id="patientId" class="login-input" placeholder="Patient ID" required>
+            <input type="password" id="password" class="login-input" placeholder="Password" required>
+            <button class="login-btn" onclick="performLogin()">Login</button>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="payment-modal" id="paymentModal">
+        <div class="payment-modal-content">
+            <h2 style="color: var(--primary-blue); margin-bottom: 20px;">Select Payment Option</h2>
+            <button class="payment-option-btn" onclick="selectPaymentOption('appointment')">
+                <i class="fas fa-calendar-check"></i> Appointment Booking (₹200)
+            </button>
+            <button class="payment-option-btn" onclick="selectPaymentOption('medicines')">
+                <i class="fas fa-pills"></i> Medicines (₹600)
+            </button>
+            <button class="payment-option-btn" onclick="selectPaymentOption('doctor')">
+                <i class="fas fa-user-md"></i> Doctor Fees (₹500)
+            </button>
+            <div id="medicinesList" style="display: none; margin-top: 15px; padding: 15px; background: var(--soft-blue); border-radius: 8px;">
+                <h4 style="margin-bottom: 10px;">Selected Medicines:</h4>
+                <ul>
+                    <li>Metformin 500mg (30 tablets)</li>
+                    <li>Sertraline 50mg (30 tablets)</li>
+                    <li>Salbutamol Inhaler (1 unit)</li>
+                </ul>
+            </div>
+            <button class="btn btn-success" style="width: 100%; margin-top: 20px; display: none;" id="proceedToPaymentBtn" onclick="proceedToPayment()">
+                Proceed to Payment
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Container -->
+    <div class="container" id="dashboardContainer">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-placeholder">
+                        <img src="https://via.placeholder.com/50" alt="MEDIVIA Logo" id="appLogo">
+                    </div>
+                    <div class="app-title">MEDIVIA</div>
+                </div>
+                <div class="header-controls">
+                    <div class="toggle-container">
+                        <span>🌙</span>
+                        <div class="toggle-switch" id="darkModeToggle">
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+                    <div class="toggle-container">
+                        <span>🔍</span>
+                        <div class="toggle-switch" id="fontSizeToggle">
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patient Information Card -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">👤 Patient Information</h2>
+            </div>
+            <div class="patient-info">
+                <div class="info-item">
+                    <span class="info-label">Name</span>
+                    <span class="info-value">Avita Kumar</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Age</span>
+                    <span class="info-value">27</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Blood Group</span>
+                    <span class="info-value">B+</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Patient ID</span>
+                    <span class="info-value">MKV1827</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Phone</span>
+                    <span class="info-value">+916309785411</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Doctor-in-Charge</span>
+                    <span class="info-value">Dr. Kabir Singh<br><small>(Emergency Consultant)</small></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Last Login</span>
+                    <span class="info-value" id="lastLoginTime">Loading...</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">QR Token Status</span>
+                    <span class="info-value status-verified">Verified ✅</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-2">
+            <!-- Medical Summary Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">📋 Medical Summary</h2>
+                </div>
+                
+                <div class="medical-section">
+                    <h3 class="medical-title">Chronic Conditions</h3>
+                    <ul class="medical-list">
+                        <li>Asthma</li>
+                        <li>Type 2 Diabetes</li>
+                        <li>Mild Anxiety</li>
+                    </ul>
+                </div>
+
+                <div class="medical-section">
+                    <h3 class="medical-title">Allergies</h3>
+                    <ul class="medical-list">
+                        <li>Penicillin</li>
+                        <li>Dust mites</li>
+                    </ul>
+                </div>
+
+                <div class="medical-section">
+                    <h3 class="medical-title">Current Medications</h3>
+                    <ul class="medical-list">
+                        <li>Metformin 500mg – Twice daily</li>
+                        <li>Salbutamol Inhaler – As needed</li>
+                        <li>Sertraline 50mg – Once daily</li>
+                    </ul>
+                </div>
+
+                <div class="medical-section">
+                    <h3 class="medical-title">Ongoing Treatments</h3>
+                    <ul class="medical-list">
+                        <li>Physiotherapy (Lower back pain)</li>
+                        <li>Scheduled blood test on: 23rd July 2025</li>
+                    </ul>
+                </div>
+
+                <!-- Emergency Contacts -->
+                <div class="emergency-contact">
+                    <h4><i class="fas fa-phone-alt"></i> Emergency Contact 1</h4>
+                    <p><strong>Maya Kumar</strong> - Sister</p>
+                    <p>+919177507780</p>
+                    <button class="call-btn" onclick="callEmergencyContact('+919177507780')">
+                        <i class="fas fa-phone"></i> Call Now
+                    </button>
+                </div>
+
+                <div class="emergency-contact">
+                    <h4><i class="fas fa-phone-alt"></i> Emergency Contact 2</h4>
+                    <p><strong>Anirudh Kumar</strong> - Brother</p>
+                    <p>+91987654321</p>
+                    <button class="call-btn" onclick="callEmergencyContact('+91987654321')">
+                        <i class="fas fa-phone"></i> Call Now
+                    </button>
+                </div>
+
+                <div class="emergency-contact">
+                    <h4><i class="fas fa-phone-alt"></i> Emergency Contact 3</h4>
+                    <p><strong>Ahaan Kumar</strong> - Brother</p>
+                    <p>+919988776655</p>
+                    <button class="call-btn" onclick="callEmergencyContact('+919988776655')">
+                        <i class="fas fa-phone"></i> Call Now
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Actions Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">🛠️ Quick Actions</h2>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <button class="btn location-share-btn" onclick="shareLocation()">
+                        <i class="fas fa-map-marker-alt"></i> Share Location + Medical Summary
+                    </button>
+                    <button class="btn btn-primary" onclick="downloadHealthSummary()">
+                        <i class="fas fa-file-pdf"></i> Download Health Summary (PDF)
+                    </button>
+                    <button class="btn btn-success" onclick="reportSymptoms()">
+                        <i class="fas fa-hospital"></i> Report Symptoms
+                    </button>
+                    <button class="btn btn-warning" onclick="showNearbyHospitals()">
+                        <i class="fas fa-hospital-alt"></i> Find Nearby Hospitals
+                    </button>
+                </div>
+
+                <!-- Digital Wallet -->
+                <div style="margin-top: 20px; padding: 18px; border: 1px solid var(--border-color); border-radius: 12px; background: linear-gradient(135deg, #f5f7fa, #e4e8eb);">
+                    <h3 style="color: var(--primary-blue); margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-wallet"></i> Digital Health Wallet
+                    </h3>
+                    <p style="text-align: center;">Available Balance:</p>
+                    <div class="wallet-balance">₹3,800</div>
+                    <p style="font-size: 14px; color: var(--text-secondary); text-align: center;">Use this balance for hospital payments</p>
+                    
+                    <div class="payment-options">
+                        <div class="payment-option" onclick="showPaymentModal('PhonePe')">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/PhonePe_Logo.svg" alt="PhonePe">
+                            PhonePe
+                        </div>
+                        <div class="payment-option" onclick="showPaymentModal('Google Pay')">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/8/8f/Google_Pay_Logo_%282018%29.svg" alt="Google Pay">
+                            Google Pay
+                        </div>
+                        <div class="payment-option" onclick="showPaymentModal('PayTM')">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/4/42/Paytm_logo.png" alt="PayTM">
+                            PayTM
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Medication Reminders -->
+                <div style="margin-top: 20px;">
+                    <h3 style="color: var(--primary-blue); margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-bell"></i> Medication Reminders
+                    </h3>
+                    <div class="reminder-item">
+                        <div>
+                            <strong>Metformin 500mg</strong>
+                            <p><i class="far fa-clock"></i> 8:00 AM & 8:00 PM</p>
+                        </div>
+                        <button class="btn btn-secondary" style="padding: 6px 12px;" onclick="snoozeReminder('Metformin')">
+                            <i class="fas fa-clock"></i> Snooze
+                        </button>
+                    </div>
+                    <div class="reminder-item">
+                        <div>
+                            <strong>Sertraline 50mg</strong>
+                            <p><i class="far fa-clock"></i> 9:00 AM</p>
+                        </div>
+                        <button class="btn btn-secondary" style="padding: 6px 12px;" onclick="snoozeReminder('Sertraline')">
+                            <i class="fas fa-clock"></i> Snooze
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Personalized Diet Plan -->
+                <div class="diet-plan" style="margin-top: 20px;">
+                    <h3 style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-utensils"></i> Today's Diet Plan
+                    </h3>
+                    <p><strong><i class="fas fa-sun"></i> Breakfast:</strong> Oatmeal with almonds and berries</p>
+                    <p><strong><i class="fas fa-sun"></i> Lunch:</strong> Grilled chicken with quinoa and vegetables</p>
+                    <p><strong><i class="fas fa-coffee"></i> Snack:</strong> Greek yogurt with walnuts</p>
+                    <p><strong><i class="fas fa-moon"></i> Dinner:</strong> Baked salmon with sweet potato and asparagus</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prescriptions & Reports -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">📦 Prescriptions & Reports</h2>
+            </div>
+            
+            <div class="prescription-item">
+                <div class="prescription-info">
+                    <div class="prescription-title">General Physician Prescription</div>
+                    <div class="prescription-date">May 2025</div>
+                    <div class="prescription-image-container">
+                        <img src="https://www.myopd.in/blog/wp-content/uploads/2020/11/Prescription-1.jpg" alt="Prescription May 2025" class="prescription-image" id="prescription1-img">
+                    </div>
+                    <div class="share-buttons" style="display: none;" id="prescription1-share">
+                        <button class="share-btn whatsapp-btn" onclick="shareViaWhatsApp('prescription1')">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </button>
+                        <button class="share-btn sms-btn" onclick="shareViaSMS('prescription1')">
+                            <i class="fas fa-sms"></i> SMS
+                        </button>
+                        <button class="share-btn email-btn" onclick="shareViaEmail('prescription1')">
+                            <i class="fas fa-envelope"></i> Email
+                        </button>
+                    </div>
+                </div>
+                <div class="prescription-actions">
+                    <button class="btn btn-secondary" onclick="togglePrescriptionImage('prescription1')">
+                        <i class="fas fa-eye"></i> Preview
+                    </button>
+                    <button class="btn btn-primary" onclick="downloadDocument('prescription1')">
+                        <i class="fas fa-download"></i> PDF
+                    </button>
+                    <button class="btn btn-success" onclick="sharePrescription('prescription1')">
+                        <i class="fas fa-share-alt"></i> Share
+                    </button>
+                </div>
+            </div>
+
+            <div class="prescription-item">
+                <div class="prescription-info">
+                    <div class="prescription-title">Psychiatry Prescription</div>
+                    <div class="prescription-date">March 2025</div>
+                    <div class="prescription-image-container">
+                        <img src="https://www.myopd.in/blog/wp-content/uploads/2020/11/Prescription-2.jpg" alt="Prescription March 2025" class="prescription-image" id="prescription2-img">
+                    </div>
+                    <div class="share-buttons" style="display: none;" id="prescription2-share">
+                        <button class="share-btn whatsapp-btn" onclick="shareViaWhatsApp('prescription2')">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </button>
+                        <button class="share-btn sms-btn" onclick="shareViaSMS('prescription2')">
+                            <i class="fas fa-sms"></i> SMS
+                        </button>
+                        <button class="share-btn email-btn" onclick="shareViaEmail('prescription2')">
+                            <i class="fas fa-envelope"></i> Email
+                        </button>
+                    </div>
+                </div>
+                <div class="prescription-actions">
+                    <button class="btn btn-secondary" onclick="togglePrescriptionImage('prescription2')">
+                        <i class="fas fa-eye"></i> Preview
+                    </button>
+                    <button class="btn btn-primary" onclick="downloadDocument('prescription2')">
+                        <i class="fas fa-download"></i> PDF
+                    </button>
+                    <button class="btn btn-success" onclick="sharePrescription('prescription2')">
+                        <i class="fas fa-share-alt"></i> Share
+                    </button>
+                </div>
+            </div>
+
+            <div class="report-item">
+                <div class="report-info">
+                    <div class="report-title">Chest X-Ray Report</div>
+                    <div class="report-date">April 2025</div>
+                    <div class="prescription-image-container">
+                        <img src="https://www.radiologyinfo.org/images/Xray-Chest-PA-Normal.jpg" alt="Chest X-Ray April 2025" class="prescription-image" id="xray1-img">
+                    </div>
+                    <div class="share-buttons" style="display: none;" id="xray1-share">
+                        <button class="share-btn whatsapp-btn" onclick="shareViaWhatsApp('xray1')">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </button>
+                        <button class="share-btn sms-btn" onclick="shareViaSMS('xray1')">
+                            <i class="fas fa-sms"></i> SMS
+                        </button>
+                        <button class="share-btn email-btn" onclick="shareViaEmail('xray1')">
+                            <i class="fas fa-envelope"></i> Email
+                        </button>
+                    </div>
+                </div>
+                <div class="report-actions">
+                    <button class="btn btn-secondary" onclick="togglePrescriptionImage('xray1')">
+                        <i class="fas fa-image"></i> View Image
+                    </button>
+                    <button class="btn btn-primary" onclick="downloadDocument('xray1')">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                    <button class="btn btn-success" onclick="sharePrescription('xray1')">
+                        <i class="fas fa-share-alt"></i> Share
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Health Insurance -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">🛡️ Health Insurance</h2>
+            </div>
+            
+            <div class="insurance-item">
+                <div class="insurance-info">
+                    <div class="insurance-title">Star Health Insurance</div>
+                    <div class="insurance-date">Policy No: SH123456789 | Valid until: 31 Dec 2025</div>
+                    <div class="prescription-image-container">
+                        <img src="https://www.starhealth.in/blog/wp-content/uploads/2022/05/health-insurance-card.jpg" alt="Health Insurance Card" class="prescription-image" id="insurance1-img">
+                    </div>
+                    <div class="share-buttons" style="display: none;" id="insurance1-share">
+                        <button class="share-btn whatsapp-btn" onclick="shareViaWhatsApp('insurance1')">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </button>
+                        <button class="share-btn sms-btn" onclick="shareViaSMS('insurance1')">
+                            <i class="fas fa-sms"></i> SMS
+                        </button>
+                        <button class="share-btn email-btn" onclick="shareViaEmail('insurance1')">
+                            <i class="fas fa-envelope"></i> Email
+                        </button>
+                    </div>
+                </div>
+                <div class="insurance-actions">
+                    <button class="btn btn-secondary" onclick="togglePrescriptionImage('insurance1')">
+                        <i class="fas fa-eye"></i> View Card
+                    </button>
+                    <button class="btn btn-primary" onclick="downloadDocument('insurance1')">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                    <button class="btn btn-success" onclick="sharePrescription('insurance1')">
+                        <i class="fas fa-share-alt"></i> Share
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nearby Hospitals (Hidden by default) -->
+        <div class="card" id="nearbyHospitalsCard" style="display: none;">
+            <div class="card-header">
+                <h2 class="card-title">🏥 Nearby Hospitals</h2>
+                <div id="locationStatus" style="font-size: 14px; color: var(--text-secondary);">
+                    <i class="fas fa-spinner fa-spin"></i> Fetching your location...
+                </div>
+            </div>
+            
+            <div id="hospitalsList"></div>
+        </div>
+
+        <!-- Health Trends -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title">📊 Health Trends & Graphs</h2>
+            </div>
+            
+            <div class="grid grid-3">
+                <div>
+                    <h3 style="margin-bottom: 10px; color: var(--primary-blue); display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-chart-line"></i> Blood Sugar (7 Days)
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="bloodSugarChart"></canvas>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 style="margin-bottom: 10px; color: var(--primary-blue); display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-heartbeat"></i> Heart Rate (24 Hours)
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="heartRateChart"></canvas>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 style="margin-bottom: 10px; color: var(--primary-blue); display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-pills"></i> Medication Adherence
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="medicationChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Privacy Note -->
+        <div class="privacy-note">
+            <i class="fas fa-lock"></i> Your data is encrypted and shared only during emergencies. All medical information is stored securely and accessed only by authorized healthcare professionals.
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <button class="chat-toggle" onclick="toggleChat()">💬</button>
+
+    <!-- Chatbot Container -->
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            <div>
+                <strong>🤖 MEDIVIA Assistant</strong>
+            </div>
+            <button onclick="toggleChat()" style="background: none; border: none; color: white; font-size: 18px; cursor: pointer;">×</button>
+        </div>
+        <div class="chatbot-messages" id="chatMessages">
+            <div class="chat-message ai">
+                Hi Avita! How are you feeling today? Would you like to report any symptoms or get health advice?
+            </div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="chatInput" placeholder="Type your message..." onkeypress="handleChatEnter(event)">
+            <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script>
+        // Store login state and last login time
+        let isLoggedIn = true;
+        let lastLoginTime = localStorage.getItem('lastLoginTime') || new Date().toISOString();
+        
+        // Set last login time display
+        document.getElementById('lastLoginTime').textContent = new Date(lastLoginTime).toLocaleString();
+
+        // Dark Mode Toggle
+        document.getElementById('darkModeToggle').addEventListener('click', function() {
+            document.body.classList.toggle('dark-mode');
+            this.classList.toggle('active');
+        });
+
+        // Font Size Toggle
+        document.getElementById('fontSizeToggle').addEventListener('click', function() {
+            document.body.classList.toggle('large-font');
+            this.classList.toggle('active');
+        });
+
+        // Initialize Charts
+        function initializeCharts() {
+            // Blood Sugar Chart
+            const bloodSugarCtx = document.getElementById('bloodSugarChart').getContext('2d');
+            new Chart(bloodSugarCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Blood Sugar (mg/dL)',
+                        data: [110, 125, 115, 135, 120, 118, 122],
+                        borderColor: '#3a7bd5',
+                        backgroundColor: 'rgba(58, 123, 213, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#3a7bd5',
+                        pointBorderWidth: 2,
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 100,
+                            max: 150,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Heart Rate Chart
+            const heartRateCtx = document.getElementById('heartRateChart').getContext('2d');
+            new Chart(heartRateCtx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 24}, (_, i) => i + ':00'),
+                    datasets: [{
+                        label: 'Heart Rate (BPM)',
+                        data: [72, 68, 65, 63, 60, 58, 62, 70, 75, 78, 82, 85, 88, 90, 87, 85, 83, 80, 78, 76, 74, 72, 70, 68],
+                        borderColor: '#2ecc71',
+                        backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#2ecc71',
+                        pointBorderWidth: 2,
+                        pointRadius: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: false,
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: false,
+                            min: 50,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Medication Adherence Chart
+            const medicationCtx = document.getElementById('medicationChart').getContext('2d');
+            new Chart(medicationCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Taken', 'Missed'],
+                    datasets: [{
+                        data: [85, 15],
+                        backgroundColor: ['#2ecc71', '#e74c3c'],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        // Chat Functions
+        function toggleChat() {
+            const chatContainer = document.getElementById('chatbotContainer');
+            const chatToggle = document.querySelector('.chat-toggle');
+            
+            if (chatContainer.style.display === 'none' || chatContainer.style.display === '') {
+                chatContainer.style.display = 'flex';
+                chatContainer.classList.add('active');
+                chatToggle.style.display = 'none';
+                document.getElementById('chatInput').focus();
+            } else {
+                chatContainer.style.display = 'none';
+                chatContainer.classList.remove('active');
+                chatToggle.style.display = 'flex';
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const messagesContainer = document.getElementById('chatMessages');
+            const message = input.value.trim();
+            
+            if (message) {
+                // Add user message
+                const userMessage = document.createElement('div');
+                userMessage.className = 'chat-message user';
+                userMessage.textContent = message;
+                messagesContainer.appendChild(userMessage);
+                
+                // Add AI response
+                setTimeout(() => {
+                    const aiMessage = document.createElement('div');
+                    aiMessage.className = 'chat-message ai';
+                    aiMessage.textContent = getAIResponse(message);
+                    messagesContainer.appendChild(aiMessage);
+                    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                    
+                    // Check if response requires action
+                    handleResponseActions(message);
+                }, 1000);
+                
+                input.value = '';
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+
+        function handleChatEnter(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function getAIResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            // Symptom tracking
+            if (lowerMessage.includes('headache') || lowerMessage.includes('head ache')) {
+                return 'I understand you have a headache. Have you taken any pain medication? Would you like me to remind you about your current medications or connect you with Dr. Kabir Singh?';
+            }
+            if (lowerMessage.includes('dizzy') || lowerMessage.includes('dizziness')) {
+                return 'Dizziness can be related to your diabetes or medications. Please check your blood sugar level and consider contacting your doctor if it persists.';
+            }
+            if (lowerMessage.includes('anxious') || lowerMessage.includes('anxiety') || lowerMessage.includes('stress')) {
+                return 'I see you\'re feeling anxious. Remember you\'re taking Sertraline for this. Try some deep breathing exercises. Would you like me to schedule a check-in with your doctor?';
+            }
+            if (lowerMessage.includes('blood sugar') || lowerMessage.includes('glucose')) {
+                return 'Your recent blood sugar readings look good. Remember to take your Metformin twice daily. Would you like me to set a reminder?';
+            }
+            if (lowerMessage.includes('diarrhea') || lowerMessage.includes('loose motion')) {
+                return 'Diarrhea can lead to dehydration, especially with diabetes. Drink plenty of fluids and monitor your blood sugar. If it persists more than 24 hours, contact your doctor.';
+            }
+            if (lowerMessage.includes('period') || lowerMessage.includes('cramps') || lowerMessage.includes('pms')) {
+                return 'For menstrual cramps, try a warm compress and gentle exercise. You can take ibuprofen if needed. Track your symptoms to discuss with your gynecologist.';
+            }
+            if (lowerMessage.includes('fever') || lowerMessage.includes('temperature')) {
+                return 'Please check your temperature. For fever above 101°F (38.3°C) that lasts more than 2 days, contact your doctor. Stay hydrated and rest.';
+            }
+            if (lowerMessage.includes('cough') || lowerMessage.includes('cold')) {
+                return 'For cough/cold symptoms, use your Salbutamol inhaler if needed. Drink warm fluids and rest. If symptoms worsen or last more than 7 days, see your doctor.';
+            }
+            if (lowerMessage.includes('back pain') || lowerMessage.includes('backache')) {
+                return 'For your back pain, continue with physiotherapy exercises. Apply heat for 20 minutes. Avoid heavy lifting. Would you like me to schedule a physio session?';
+            }
+            
+            // Emergency responses
+            if (lowerMessage.includes('call doctor') || lowerMessage.includes('contact doctor')) {
+                return 'I\'ll help you contact Dr. Kabir Singh. Would you like me to call the emergency line or schedule a regular appointment?';
+            }
+            if (lowerMessage.includes('emergency') || lowerMessage.includes('urgent')) {
+                return 'This seems urgent. I\'m sharing your location and medical summary with the emergency contact: +917416557557. Stay calm, help is on the way.';
+            }
+            if (lowerMessage.includes('report') || lowerMessage.includes('symptom')) {
+                return 'I can help you report symptoms. Please describe what you\'re experiencing in detail (e.g., "I have had a headache for 3 days").';
+            }
+            
+            // Mental wellness
+            if (lowerMessage.includes('mental') || lowerMessage.includes('depress') || lowerMessage.includes('sad')) {
+                return 'Mental health is important. Would you like to:\n1. Schedule a therapy session\n2. Get mindfulness exercises\n3. Contact your psychiatrist?';
+            }
+            
+            // General health advice
+            if (lowerMessage.includes('diet') || lowerMessage.includes('food') || lowerMessage.includes('eat')) {
+                return 'For your diabetes, I recommend:\n- High fiber foods (vegetables, whole grains)\n- Lean proteins (fish, chicken)\n- Healthy fats (avocados, nuts)\nWould you like today\'s personalized diet plan?';
+            }
+            if (lowerMessage.includes('exercise') || lowerMessage.includes('workout') || lowerMessage.includes('activity')) {
+                return 'Regular exercise helps manage diabetes and anxiety. Aim for:\n- 30 mins walking daily\n- Yoga or stretching\n- Strength training 2x/week\nWould you like exercise recommendations?';
+            }
+            
+            // Default response
+            return 'I\'m here to help with your health concerns. You can ask about symptoms, medications, or request to contact your doctor. How can I assist you today?';
+        }
+
+        function handleResponseActions(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            if (lowerMessage.includes('emergency') || lowerMessage.includes('urgent')) {
+                setTimeout(() => {
+                    shareLocation();
+                }, 1500);
+            }
+            
+            if (lowerMessage.includes('call doctor') || lowerMessage.includes('contact doctor')) {
+                setTimeout(() => {
+                    callEmergencyContact('+917416557557');
+                }, 1500);
+            }
+            
+            if (lowerMessage.includes('diet') || lowerMessage.includes('food')) {
+                setTimeout(() => {
+                    const dietPlan = document.querySelector('.diet-plan');
+                    dietPlan.scrollIntoView({ behavior: 'smooth' });
+                }, 1500);
+            }
+        }
+
+        // Prescription Functions
+        function togglePrescriptionImage(id) {
+            const img = document.getElementById(`${id}-img`);
+            const shareButtons = document.getElementById(`${id}-share`);
+            
+            if (img.style.display === 'none' || img.style.display === '') {
+                img.style.display = 'block';
+                shareButtons.style.display = 'flex';
+            } else {
+                img.style.display = 'none';
+                shareButtons.style.display = 'none';
+            }
+        }
+
+        function sharePrescription(id) {
+            const shareButtons = document.getElementById(`${id}-share`);
+            if (shareButtons.style.display === 'none' || shareButtons.style.display === '') {
+                shareButtons.style.display = 'flex';
+            } else {
+                shareButtons.style.display = 'none';
+            }
+        }
+
+        function shareViaWhatsApp(id) {
+            let title, date;
+            if (id.includes('prescription')) {
+                title = document.querySelector(`#${id} .prescription-title`).textContent;
+                date = document.querySelector(`#${id} .prescription-date`).textContent;
+            } else if (id.includes('xray')) {
+                title = document.querySelector(`#${id} .report-title`).textContent;
+                date = document.querySelector(`#${id} .report-date`).textContent;
+            } else if (id.includes('insurance')) {
+                title = document.querySelector(`#${id} .insurance-title`).textContent;
+                date = document.querySelector(`#${id} .insurance-date`).textContent;
+            }
+            
+            const message = `Sharing my medical document:\n${title}\n${date}\n\nView it here: https://medivia.example.com/share/${id}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(message)}`);
+        }
+
+        function shareViaSMS(id) {
+            let title, date;
+            if (id.includes('prescription')) {
+                title = document.querySelector(`#${id} .prescription-title`).textContent;
+                date = document.querySelector(`#${id} .prescription-date`).textContent;
+            } else if (id.includes('xray')) {
+                title = document.querySelector(`#${id} .report-title`).textContent;
+                date = document.querySelector(`#${id} .report-date`).textContent;
+            } else if (id.includes('insurance')) {
+                title = document.querySelector(`#${id} .insurance-title`).textContent;
+                date = document.querySelector(`#${id} .insurance-date`).textContent;
+            }
+            
+            const message = `Sharing my medical document:\n${title}\n${date}`;
+            window.open(`sms:?body=${encodeURIComponent(message)}`);
+        }
+
+        function shareViaEmail(id) {
+            let title, date;
+            if (id.includes('prescription')) {
+                title = document.querySelector(`#${id} .prescription-title`).textContent;
+                date = document.querySelector(`#${id} .prescription-date`).textContent;
+            } else if (id.includes('xray')) {
+                title = document.querySelector(`#${id} .report-title`).textContent;
+                date = document.querySelector(`#${id} .report-date`).textContent;
+            } else if (id.includes('insurance')) {
+                title = document.querySelector(`#${id} .insurance-title`).textContent;
+                date = document.querySelector(`#${id} .insurance-date`).textContent;
+            }
+            
+            const subject = `My Medical Document: ${title}`;
+            const body = `Dear Recipient,\n\nI'm sharing my medical document:\n${title}\n${date}\n\nBest regards,\nAvita Kumar`;
+            window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+        }
+
+        // Hospital Functions
+        function showNearbyHospitals() {
+            const card = document.getElementById('nearbyHospitalsCard');
+            if (card.style.display === 'none' || card.style.display === '') {
+                card.style.display = 'block';
+                card.scrollIntoView({ behavior: 'smooth' });
+                
+                // Clear previous hospitals
+                document.getElementById('hospitalsList').innerHTML = '';
+                
+                // Get user's location first
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+                            document.getElementById('locationStatus').innerHTML = 
+                                `<i class="fas fa-map-marker-alt"></i> Your location: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                            
+                            // Simulate fetching nearby hospitals (in a real app, you'd call an API)
+                            setTimeout(() => {
+                                displayNearbyHospitals(lat, lng);
+                            }, 1500);
+                        },
+                        function(error) {
+                            document.getElementById('locationStatus').innerHTML = 
+                                `<i class="fas fa-exclamation-triangle"></i> Could not get your location: ${error.message}`;
+                        }
+                    );
+                } else {
+                    document.getElementById('locationStatus').innerHTML = 
+                        '<i class="fas fa-exclamation-triangle"></i> Geolocation is not supported by this browser';
+                }
+            } else {
+                card.style.display = 'none';
+            }
+        }
+
+        function displayNearbyHospitals(lat, lng) {
+            const hospitalsList = document.getElementById('hospitalsList');
+            
+            // Sample hospitals data (in a real app, this would come from an API)
+            const hospitals = [
+                {
+                    name: "SevenHills Hospital",
+                    distance: (Math.random() * 3 + 0.5).toFixed(1),
+                    address: "Duvvada, Visakhapatnam - 530046",
+                    phone: "+918912345678"
+                },
+                {
+                    name: "Kurmannapalem Medical Center",
+                    distance: (Math.random() * 2 + 0.3).toFixed(1),
+                    address: "Kurmannapalem, Visakhapatnam - 530026",
+                    phone: "+918976543210"
+                },
+                {
+                    name: "Vizag General Hospital",
+                    distance: (Math.random() * 4 + 1).toFixed(1),
+                    address: "Near Duvvada Railway Station, Visakhapatnam - 530046",
+                    phone: "+918912340987"
+                }
+            ];
+            
+            // Sort by distance
+            hospitals.sort((a, b) => parseFloat(a.distance) - parseFloat(b.distance));
+            
+            // Display each hospital
+            hospitals.forEach(hospital => {
+                const hospitalCard = document.createElement('div');
+                hospitalCard.className = 'hospital-card';
+                hospitalCard.innerHTML = `
+                    <div class="hospital-name">
+                        <i class="fas fa-hospital"></i> ${hospital.name}
+                    </div>
+                    <div class="hospital-distance">
+                        <i class="fas fa-map-marker-alt"></i> ${hospital.distance} km away | Emergency: Open 24/7
+                    </div>
+                    <p><i class="fas fa-map-pin"></i> ${hospital.address}</p>
+                    <p><i class="fas fa-phone"></i> Phone: ${hospital.phone}</p>
+                    <button class="btn btn-primary" onclick="showAppointmentForm('${hospital.name.replace("'", "\\'")}')">
+                        <i class="fas fa-calendar-check"></i> Book Appointment
+                    </button>
+                    
+                    <div class="appointment-form" id="${hospital.name.toLowerCase().replace(/\s+/g, '-')}-appointment-form">
+                        <h4>Book Appointment at ${hospital.name}</h4>
+                        <select class="login-input">
+                            <option value="">Select Department</option>
+                            <option value="cardiology">Cardiology</option>
+                            <option value="neurology">Neurology</option>
+                            <option value="general">General Physician</option>
+                        </select>
+                        <input type="date" class="login-input" min="${new Date().toISOString().split('T')[0]}">
+                        <input type="time" class="login-input">
+                        <button class="btn btn-success" onclick="bookAppointment('${hospital.name.replace("'", "\\'")}')">
+                            <i class="fas fa-check"></i> Confirm Booking
+                        </button>
+                    </div>
+                `;
+                hospitalsList.appendChild(hospitalCard);
+            });
+        }
+
+        function showAppointmentForm(hospital) {
+            const formId = `${hospital.toLowerCase().replace(/\s+/g, '-')}-appointment-form`;
+            const form = document.getElementById(formId);
+            
+            if (form.style.display === 'none' || form.style.display === '') {
+                // Hide all other forms first
+                document.querySelectorAll('.appointment-form').forEach(f => {
+                    f.style.display = 'none';
+                });
+                form.style.display = 'block';
+                
+                // Set default date to today and time to next hour
+                const today = new Date().toISOString().split('T')[0];
+                const nextHour = new Date();
+                nextHour.setHours(nextHour.getHours() + 1);
+                const timeString = nextHour.getHours().toString().padStart(2, '0') + ':00';
+                
+                form.querySelector('input[type="date"]').value = today;
+                form.querySelector('input[type="time"]').value = timeString;
+            } else {
+                form.style.display = 'none';
+            }
+        }
+
+        function bookAppointment(hospital) {
+            const formId = `${hospital.toLowerCase().replace(/\s+/g, '-')}-appointment-form`;
+            const form = document.getElementById(formId);
+            const department = form.querySelector('select').value;
+            const date = form.querySelector('input[type="date"]').value;
+            const time = form.querySelector('input[type="time"]').value;
+            
+            if (!department || !date || !time) {
+                showNotification('Please fill all fields');
+                return;
+            }
+            
+            showNotification(`Appointment booked at ${hospital}:\nDepartment: ${department}\nDate: ${date}\nTime: ${time}`);
+            form.style.display = 'none';
+            
+            // Add to chat
+            const messagesContainer = document.getElementById('chatMessages');
+            const aiMessage = document.createElement('div');
+            aiMessage.className = 'chat-message ai';
+            aiMessage.textContent = `Your appointment at ${hospital} is confirmed for ${date} at ${time}. A reminder will be sent 1 hour before.`;
+            messagesContainer.appendChild(aiMessage);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Payment Functions
+        let selectedPaymentOption = null;
+        let paymentMethod = '';
+
+        function showPaymentModal(method) {
+            paymentMethod = method;
+            document.getElementById('paymentModal').style.display = 'flex';
+            document.getElementById('proceedToPaymentBtn').style.display = 'none';
+            document.getElementById('medicinesList').style.display = 'none';
+            
+            // Reset selected option
+            document.querySelectorAll('.payment-option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+        }
+
+        function selectPaymentOption(option) {
+            selectedPaymentOption = option;
+            
+            // Update UI
+            document.querySelectorAll('.payment-option-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            // Show medicines list if medicines selected
+            if (option === 'medicines') {
+                document.getElementById('medicinesList').style.display = 'block';
+            } else {
+                document.getElementById('medicinesList').style.display = 'none';
+            }
+            
+            // Show proceed button
+            document.getElementById('proceedToPaymentBtn').style.display = 'block';
+        }
+
+        function proceedToPayment() {
+            if (!selectedPaymentOption) {
+                showNotification('Please select a payment option');
+                return;
+            }
+            
+            let amount = 0;
+            let description = '';
+            
+            switch(selectedPaymentOption) {
+                case 'appointment':
+                    amount = 200;
+                    description = 'Appointment Booking';
+                    break;
+                case 'medicines':
+                    amount = 600;
+                    description = 'Medicines Purchase';
+                    break;
+                case 'doctor':
+                    amount = 500;
+                    description = 'Doctor Consultation Fees';
+                    break;
+            }
+            
+            // Close modal
+            document.getElementById('paymentModal').style.display = 'none';
+            
+            // Show notification
+            showNotification(`Redirecting to ${paymentMethod} for ${description} payment of ₹${amount}`);
+            
+            // In a real app, you would redirect to the payment gateway
+            setTimeout(() => {
+                if (paymentMethod === 'PhonePe') {
+                    // Simulate PhonePe payment flow
+                    window.open('https://www.phonepe.com/', '_blank');
+                }
+            }, 1500);
+        }
+
+        // Utility Functions
+        function callEmergencyContact(number) {
+            window.location.href = `tel:${number}`;
+        }
+
+        function shareLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const medicalSummary = "Patient: Avita Kumar (27, B+) - Chronic: Asthma, Diabetes, Anxiety - Allergies: Penicillin, Dust - Emergency Contact: Maya Kumar +919177507780";
+                    const emergencyMessage = `MEDICAL EMERGENCY - Location: https://maps.google.com/?q=${lat},${lng} - ${medicalSummary}`;
+                    
+                    // Send SMS
+                    window.open(`sms:+917416557557?body=${encodeURIComponent(emergencyMessage)}`);
+                    
+                    // Make call
+                    setTimeout(() => {
+                        window.location.href = 'tel:+917416557557';
+                    }, 1000);
+                    
+                    showNotification('Emergency location and medical summary shared with hospital emergency services!');
+                }, function(error) {
+                    showNotification('Location access denied. Please enable location services and try again.');
+                });
+            } else {
+                showNotification('Geolocation is not supported by this browser.');
+            }
+        }
+
+        function downloadHealthSummary() {
+            // Create a comprehensive health summary
+            const summary = `
+MEDIVIA HEALTH SUMMARY
+Patient: Avita Kumar
+Generated: ${new Date().toLocaleDateString()}
+
+PATIENT INFORMATION:
+- Name: Avita Kumar
+- Age: 27
+- Blood Group: B+
+- Patient ID: MKV1827
+- Phone: +916309785411
+- Doctor-in-Charge: Dr. Kabir Singh (Emergency Consultant)
+
+CHRONIC CONDITIONS:
+- Asthma
+- Type 2 Diabetes
+- Mild Anxiety
+
+ALLERGIES:
+- Penicillin
+- Dust mites
+
+CURRENT MEDICATIONS:
+- Metformin 500mg – Twice daily
+- Salbutamol Inhaler – As needed
+- Sertraline 50mg – Once daily
+
+ONGOING TREATMENTS:
+- Physiotherapy (Lower back pain)
+- Scheduled blood test: 23rd July 2025
+
+HEALTH INSURANCE:
+- Provider: Star Health Insurance
+- Policy No: SH123456789
+- Valid until: 31 Dec 2025
+
+EMERGENCY CONTACTS:
+1. Maya Kumar (Sister): +919177507780
+2. Anirudh Kumar (Brother): +91987654321
+3. Ahaan Kumar (Brother): +919988776655
+
+This summary is generated by MEDIVIA for emergency medical purposes.
+            `;
+            
+            const blob = new Blob([summary], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Avita_Kumar_Health_Summary.txt';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            showNotification('Health summary downloaded successfully!');
+        }
+
+        function reportSymptoms() {
+            toggleChat();
+            document.getElementById('chatInput').value = 'I need to report symptoms';
+            document.getElementById('chatInput').focus();
+        }
+
+        function downloadDocument(docId) {
+            const documents = {
+                'prescription1': 'General_Physician_Prescription_May_2025.pdf',
+                'prescription2': 'Psychiatry_Prescription_March_2025.pdf',
+                'xray1': 'Chest_XRay_April_2025.jpg',
+                'insurance1': 'Star_Health_Insurance_Card.jpg'
+            };
+            
+            // Create a temporary link for download
+            const link = document.createElement('a');
+            link.href = docId.includes('prescription') ? 
+                'https://www.myopd.in/blog/wp-content/uploads/2020/11/Prescription-1.jpg' : 
+                docId.includes('insurance') ? 
+                'https://www.starhealth.in/blog/wp-content/uploads/2022/05/health-insurance-card.jpg' : 
+                'https://www.radiologyinfo.org/images/Xray-Chest-PA-Normal.jpg';
+            link.download = documents[docId];
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification(`Downloading: ${documents[docId]}`);
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Update last login time before logging out
+                localStorage.setItem('lastLoginTime', new Date().toISOString());
+                
+                document.getElementById('dashboardContainer').style.display = 'none';
+                document.getElementById('loginContainer').style.display = 'flex';
+                document.getElementById('chatbotContainer').style.display = 'none';
+                document.querySelector('.chat-toggle').style.display = 'flex';
+                isLoggedIn = false;
+            }
+        }
+
+        function performLogin() {
+            const patientId = document.getElementById('patientId').value;
+            const password = document.getElementById('password').value;
+            
+            if (patientId === 'MKV1827' && password === '1234567890') {
+                // Update last login time
+                lastLoginTime = new Date().toISOString();
+                localStorage.setItem('lastLoginTime', lastLoginTime);
+                document.getElementById('lastLoginTime').textContent = new Date(lastLoginTime).toLocaleString();
+                
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('dashboardContainer').style.display = 'block';
+                isLoggedIn = true;
+                
+                showNotification('Login successful! Welcome back, Avita.');
+            } else {
+                showNotification('Invalid Patient ID or Password. Please try again.');
+            }
+        }
+
+        function snoozeReminder(medication) {
+            showNotification(`Reminder for ${medication} snoozed for 30 minutes`);
+        }
+
+        function makePayment(method) {
+            showPaymentModal(method);
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `
+                <span>${message}</span>
+                <button class="notification-close" onclick="this.parentElement.remove()">×</button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show dashboard by default
+            document.getElementById('dashboardContainer').style.display = 'block';
+            document.getElementById('loginContainer').style.display = 'none';
+            
+            initializeCharts();
+            
+            // Replace placeholder logo with your actual logo
+            const logo = document.getElementById('appLogo');
+            logo.src = "https://via.placeholder.com/50"; // Replace with your logo URL
+            
+            // Initialize all images for prescriptions and insurance
+            document.getElementById('prescription1-img').src = "https://www.myopd.in/blog/wp-content/uploads/2020/11/Prescription-1.jpg";
+            document.getElementById('prescription2-img').src = "https://www.myopd.in/blog/wp-content/uploads/2020/11/Prescription-2.jpg";
+            document.getElementById('xray1-img').src = "https://www.radiologyinfo.org/images/Xray-Chest-PA-Normal.jpg";
+            document.getElementById('insurance1-img').src = "https://www.starhealth.in/blog/wp-content/uploads/2022/05/health-insurance-card.jpg";
+        });
+    </script>
+</body>
+</html>
